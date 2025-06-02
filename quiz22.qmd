@@ -1,0 +1,57 @@
+Tyler Zarybnisky Quiz 22
+
+
+Matrix:
+
+```{r}
+
+data <- read.csv("countries.csv", stringsAsFactors = FALSE)
+
+country_names <- data[["Country.Name"]]
+coords <- cbind(data[["Capital.Latitude"]], data[["Capital.Longitude"]])
+
+dc_idx <- which(country_names == "United States")
+
+dc_coords <- coords[dc_idx, ]
+
+dc_mx <- matrix(rep(dc_coords, each = nrow(coords)), nrow = nrow(coords))
+
+difference <- coords - dc_mx
+
+distances <- apply(difference, 1, function(row) sqrt(sum(row^2)))
+
+exclusions <- which(country_names %in% c("United States", "US Minor Outlying Islands"))
+distances[exclusions] <- Inf
+
+top_10_indices <- order(distances)[1:10]
+
+print(country_names[top_10_indices])
+
+
+```
+
+
+Data Frame:
+
+```{r}
+
+data <- read.csv("countries.csv", stringsAsFactors = FALSE)
+df1 <- data[ , c("Country.Name", "Capital.Latitude", "Capital.Longitude")]
+
+dc_idx <- which(df1$Country.Name == "United States")
+dc_lat <- df1[dc_idx, "Capital.Latitude"]
+dc_long <- df1[dc_idx, "Capital.Longitude"]
+dc_coords <- c(dc_lat, dc_long)
+
+df1$dc_lats <- dc_lat
+df1$dc_longs <- dc_long
+
+df1$distance <- sqrt(((df1$dc_lats - df1$Capital.Latitude)^2)+((df1$dc_longs - df1$Capital.Longitude)^2))
+
+zero_indices <- which(df1$distance == 0)
+df1$distance[zero_indices] <- Inf
+
+low_10_indices <- order(df1$distance)[1:10]
+print(df1$Country.Name[low_10_indices])
+
+```
